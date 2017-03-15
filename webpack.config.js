@@ -1,3 +1,6 @@
+const webpack = require('webpack');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
 module.exports = {
   devServer: {
     contentBase: './public',
@@ -5,8 +8,11 @@ module.exports = {
     inline: true,
     historyApiFallback: true,
   },
-  entry: { js: './src/main.js' },
-  output: { path: __dirname + './public', filename: __dirname + 'bundle.js' },
+  entry: {
+    js: './src/main.js',
+    css: './src/main.css',
+  },
+  output: { path: __dirname + '/public', filename: 'bundle.js' },
   module: {
     loaders: [
       {
@@ -14,7 +20,22 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader',
       },
-    ],
+      {
+        test: /\.css$/,
+        loader: ExtractTextPlugin.extract(
+          'css-loader!postcss-loader'
+        ),
+      },
+    ]
   },
+  plugins: [
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        postcss: [
+          require('postcss-easy-import')({ glob: true })
+        ],
+      },
+    })
+  ],
   devtool: 'source-map',
 };
